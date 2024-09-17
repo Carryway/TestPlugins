@@ -1,4 +1,4 @@
-package com.hexated
+package com.carryflix
 
 import com.lagradost.cloudstream3.Episode
 import com.lagradost.cloudstream3.LoadResponse
