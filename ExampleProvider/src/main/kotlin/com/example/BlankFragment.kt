@@ -1,88 +1,90 @@
-package com.carryflix
+package com.hexated
 
-import android.content.res.ColorStateList
-import android.graphics.drawable.Drawable
-import android.os.Build
-import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import com.lagradost.cloudstream3.R
-import android.widget.ImageView
-import android.widget.TextView
-import androidx.annotation.RequiresApi
-import androidx.core.content.res.ResourcesCompat
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.lagradost.cloudstream3.utils.UIHelper.colorFromAttribute
+import com.lagradost.cloudstream3.SubtitleFile
+import com.lagradost.cloudstream3.apmap
+import com.lagradost.cloudstream3.app
+import com.lagradost.cloudstream3.base64Decode
+import com.lagradost.cloudstream3.extractors.*
+import com.lagradost.cloudstream3.utils.ExtractorApi
+import com.lagradost.cloudstream3.utils.ExtractorLink
+import com.lagradost.cloudstream3.utils.M3u8Helper
+import com.lagradost.cloudstream3.utils.loadExtractor
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+open class Uplayer : ExtractorApi() {
+    override val name = "Uplayer"
+    override val mainUrl = "https://uplayer.xyz"
+    override val requiresReferer = true
 
-/**
- * A simple [Fragment] subclass.
- * Use the [BlankFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class BlankFragment(val plugin: TestPlugin) : BottomSheetDialogFragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    override suspend fun getUrl(
+        url: String,
+        referer: String?,
+        subtitleCallback: (SubtitleFile) -> Unit,
+        callback: (ExtractorLink) -> Unit
+    ) {
+        val res = app.get(url,referer=referer).text
+        val m3u8 = Regex("file:\\s*\"(.*?m3u8.*?)\"").find(res)?.groupValues?.getOrNull(1)
+        M3u8Helper.generateM3u8(
+            name,
+            m3u8 ?: return,
+            mainUrl
+        ).forEach(callback)
+    }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+}
+
+open class Kotakajaib : ExtractorApi() {
+    override val name = "Kotakajaib"
+    override val mainUrl = "https://kotakajaib.me"
+    override val requiresReferer = true
+
+    override suspend fun getUrl(
+        url: String,
+        referer: String?,
+        subtitleCallback: (SubtitleFile) -> Unit,
+        callback: (ExtractorLink) -> Unit
+    ) {
+        app.get(url,referer=referer).document.select("ul#dropdown-server li a").apmap {
+            loadExtractor(base64Decode(it.attr("data-frame")), "$mainUrl/", subtitleCallback, callback)
         }
     }
 
-    private fun getDrawable(name: String): Drawable? {
-        val id = plugin.resources!!.getIdentifier(name, "drawable", BuildConfig.LIBRARY_PACKAGE_NAME)
-        return ResourcesCompat.getDrawable(plugin.resources!!, id, null)
-    }
+}
 
-    private fun getString(name: String): String? {
-        val id = plugin.resources!!.getIdentifier(name, "string", BuildConfig.LIBRARY_PACKAGE_NAME)
-        return plugin.resources!!.getString(id)
-    }
+class Doods : DoodLaExtractor() {
+    override var name = "Doods"
+    override var mainUrl = "https://doods.pro"
+}
 
-    private fun <T : View> View.findView(name: String): T {
-        val id = plugin.resources!!.getIdentifier(name, "id", BuildConfig.LIBRARY_PACKAGE_NAME)
-        return this.findViewById(id)
-    }
+class Dutamovie21 : StreamSB() {
+    override var name = "Dutamovie21"
+    override var mainUrl = "https://dutamovie21.xyz"
+}
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        val id = plugin.resources!!.getIdentifier("fragment_blank", "layout", BuildConfig.LIBRARY_PACKAGE_NAME)
-        val layout = plugin.resources!!.getLayout(id)
-        return inflater.inflate(layout, container, false)
-    }
+class FilelionsTo : Filesim() {
+    override val name = "Filelions"
+    override var mainUrl = "https://filelions.to"
+}
 
-    @RequiresApi(Build.VERSION_CODES.M)
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val imageView = view.findView<ImageView>("imageView")
-        val imageView2 = view.findView<ImageView>("imageView2")
-        val textView = view.findView<TextView>("textView")
-        val textView2 = view.findView<TextView>("textView2")
+class FilelionsOn : Filesim() {
+    override val name = "Filelions"
+    override var mainUrl = "https://filelions.online"
+}
 
-        textView.text = getString("hello_fragment")
-        textView.setTextAppearance(view.context, R.style.ResultInfoText)
-        textView2.text = view.context.resources.getText(R.string.legal_notice_text)
+class Lylxan : Filesim() {
+    override val name = "Lylxan"
+    override var mainUrl = "https://lylxan.com"
+}
 
-        imageView.setImageDrawable(
-            getDrawable("ic_android_24dp")
-        )
-        imageView.imageTintList = ColorStateList.valueOf(view.context.getColor(R.color.white))
+class Embedwish : Filesim() {
+    override val name = "Embedwish"
+    override var mainUrl = "https://embedwish.com"
+}
 
-        imageView2.setImageDrawable(
-            getDrawable("ic_android_24dp")
-        )
-        imageView2.imageTintList = ColorStateList.valueOf(view.context.colorFromAttribute(R.attr.white))
-    }
+class Likessb : StreamSB() {
+    override var name = "Likessb"
+    override var mainUrl = "https://likessb.com"
+}
+
+class DbGdriveplayer : Gdriveplayer() {
+    override var mainUrl = "https://database.gdriveplayer.us"
 }
