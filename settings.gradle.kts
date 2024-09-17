@@ -8,4 +8,5 @@ include(
     "CodeStream"
     "SoraStream"
     "Gomov"
+    "Carryflix"
 )
