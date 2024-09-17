@@ -5,5 +5,7 @@ rootProject.name = "CloudstreamPlugins"
 
 // Plugins are included like this
 include(
-    "ExampleProvider"
+    "CodeStream"
+    "SoraStream"
+    "Gomov"
 )
